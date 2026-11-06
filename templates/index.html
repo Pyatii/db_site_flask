@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Данные SQLite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <p class="eyebrow">SQLite + Flask</p>
+        <h1>Данные из SQLite</h1>
+        <p class="description">Подключён файл базы: <code>{{ database_name }}</code>.</p>
+      </header>
+
+      <nav class="tabs" aria-label="Разделы базы данных">
+        <a class="tab tab--active" href="{{ url_for('index') }}">Таблицы</a>
+        <a class="tab" href="{{ url_for('query') }}">Свой запрос</a>
+      </nav>
+
+      {% if tables %}
+        <form class="table-picker" method="get">
+          <label for="table">Таблица</label>
+          <select id="table" name="table" onchange="this.form.submit()">
+            {% for table in tables %}
+              <option value="{{ table }}" {% if table == selected_table %}selected{% endif %}>{{ table }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit">Показать</button>
+        </form>
+
+        <p class="description">Результат запроса <code>SELECT * FROM "{{ selected_table }}" LIMIT 100</code>.</p>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                {% for column in columns %}
+                  <th>{{ column }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in rows %}
+                <tr>
+                  {% for value in row %}
+                    <td>{{ value if value is not none else "—" }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if not rows %}
+          <p class="empty">В таблице нет записей.</p>
+        {% endif %}
+      {% else %}
+        <p class="empty">В подключённой базе нет пользовательских таблиц.</p>
+      {% endif %}
+    </main>
+  </body>
+</html>

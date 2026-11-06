@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Свой запрос — Данные SQLite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <p class="eyebrow">SQLite + Flask</p>
+        <h1>Свой SQL-запрос</h1>
+        <p class="description">Подключён файл базы: <code>{{ database_name }}</code>.</p>
+      </header>
+
+      <nav class="tabs" aria-label="Разделы базы данных">
+        <a class="tab" href="{{ url_for('index') }}">Таблицы</a>
+        <a class="tab tab--active" href="{{ url_for('query') }}">Свой запрос</a>
+      </nav>
+
+      <form class="query-form" method="post">
+        <label for="query">SQL-запрос</label>
+        <textarea id="query" name="query" rows="9" spellcheck="false" placeholder="SELECT * FROM employees LIMIT 10">{{ sql_query }}</textarea>
+        <p class="form-hint">Разрешены только запросы <code>SELECT</code> и <code>WITH</code>. Вывод ограничен 100 строками.</p>
+        <button type="submit">Выполнить запрос</button>
+      </form>
+
+      {% if query_error %}
+        <p class="message message--error">{{ query_error }}</p>
+      {% endif %}
+
+      {% if columns %}
+        <section class="query-result" aria-labelledby="result-title">
+          <h2 id="result-title">Результат</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  {% for column in columns %}
+                    <th>{{ column }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in rows %}
+                  <tr>
+                    {% for value in row %}
+                      <td>{{ value if value is not none else "—" }}</td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if not rows %}
+            <p class="empty">Запрос не вернул записей.</p>
+          {% elif has_more_rows %}
+            <p class="form-hint">Показаны первые 100 строк результата.</p>
+          {% endif %}
+        </section>
+      {% endif %}
+    </main>
+  </body>
+</html>

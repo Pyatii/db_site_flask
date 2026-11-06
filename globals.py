@@ -1,0 +1,1 @@
+db_path = "C:/Users/User/Documents/SQLITE/studydb.db"
